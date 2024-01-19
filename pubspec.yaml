@@ -38,6 +38,8 @@ dependencies:
   flutter_riverpod: ^2.3.7
   design_system_weincode: ^0.0.3
   http: ^0.13.6
+  flutter_polyline_points: ^1.0.0
+  google_maps_flutter: ^2.3.0
 
 dev_dependencies:
   flutter_test:

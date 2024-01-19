@@ -3,4 +3,6 @@ class AppRoutes{
   static const pokemon = 'pokemon';
   static const astronomyDailyData = 'astronomyDailyData';
   static const  movit = 'movit';
+  static const  mapaMovit = 'mapaMovit';
+
 }

@@ -45,6 +45,14 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(fontSize: 21)),
                 onPressed: () => Navigator.of(context).pushNamed(AppRoutes.movit)
           )),
+          const WeincodeSepareted(nSepareted: 0.5),
+          SizedBox(
+            height: 50.0,
+            child: ElevatedButton(
+                child: const Text('Movit mapa 🐡',
+                    style: TextStyle(fontSize: 21)),
+                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.mapaMovit)
+          )),
         ]),
       ),
     );
