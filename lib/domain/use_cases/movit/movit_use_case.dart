@@ -4,5 +4,5 @@ import '../../models/movit/movit.dart';
 class MovitUseCase {
   final MovitGateway movitGateway;
   MovitUseCase(this.movitGateway);
-  Future<Movit> getMovits() => movitGateway.getMovits();
+   Future<Movit> getMovits(double fromLat, double fromLon) => movitGateway.getMovits(fromLat, fromLon);
 }

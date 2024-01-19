@@ -5,7 +5,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../domain/models/movit/movit.dart';
 
 class MapScreen extends StatefulWidget {
-  final Movit movit;
+  final Future<Movit> movit;
 
   MapScreen({required this.movit});
 
@@ -19,17 +19,15 @@ class _MapScreenState extends State<MapScreen> {
   Set<Polyline> polylines = {};
   Itinerary? selectedItinerary;
 
-  double currentLocationLat = -11.915728408209805;
-  double currentLocationLon = -77.05261230468751;
-
-  double destinationLat = -12.113515738274808;
-  double destinationLon = -77.02617645263673;
+  
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      showItineraryDialog(context, widget.movit.content.plan.itineraries);
+      widget.movit.then((movit) {
+        showItineraryDialog(context, movit.content.plan.itineraries);
+      });
     });
   }
 
@@ -66,20 +64,7 @@ class _MapScreenState extends State<MapScreen> {
     markers.clear();
     polylines.clear();
       // Add marker for start location (current location)
-  markers.add(Marker(
-    markerId: MarkerId('start'),
-    position: LatLng(currentLocationLat, currentLocationLon), // replace with your current location coordinates
-    infoWindow: InfoWindow(title: 'Start'),
-    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-  ));
 
-  // Add marker for end location (destination)
-  markers.add(Marker(
-    markerId: MarkerId('end'),
-    position: LatLng(destinationLat, destinationLon), // replace with your destination coordinates
-    infoWindow: InfoWindow(title: 'End'),
-     //icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-  ));
     for (var leg in selectedItinerary!.legs) {
       // Create a marker for the start and end of the leg
       markers.add(Marker(
@@ -140,7 +125,8 @@ class _MapScreenState extends State<MapScreen> {
     floatingActionButton: FloatingActionButton(
       child: Icon(Icons.directions),
       onPressed: () {
-        showItineraryDialog(context, widget.movit.content.plan.itineraries);
+        mapController!.showMarkerInfoWindow(MarkerId('from_${selectedItinerary!.legs[0].from.name}'));
+      
       },
     ),
     

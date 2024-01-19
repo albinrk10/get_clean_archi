@@ -11,57 +11,59 @@ import '../presentation/screen/mapa_movit_page.dart';
 import '../presentation/screen/movit_ruta_page.dart';
 import '../presentation/screen/pokemon_page.dart';
 import '../presentation/screen/show_dayli_data.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CleanArchExampleSepareteUsingFolderApp extends ConsumerWidget {
   const CleanArchExampleSepareteUsingFolderApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    
+
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ligthThemeWeincode,
-      onGenerateRoute: (routeSetting) {
-        switch (routeSetting.name) {
-          case (AppRoutes.pokemon):
-            return MaterialPageRoute(
-                builder: ((context) => PokemonPage(
-                      pokemonDetailList:
-                          ref.watch(pokemonProvider).getAllPokemons(),
-                    )));
-          case (AppRoutes.astronomyDailyData):
-            return MaterialPageRoute(
-                builder: ((context) => ShowDailyDataPage(
-                      astronomyDailyData: ref
-                          .watch(astronomyDailyDataProvider)
-                          .getAstronomydailyData(),
-                    )));
-          case (AppRoutes.movit):
-            return MaterialPageRoute(
-                builder: ((context) => Movitgape(
-                      movit: ref.watch(moviProvider).getMovits(),
-                    )));
-          case (AppRoutes.mapaMovit):
-            return MaterialPageRoute(
-              builder: (context) => FutureBuilder<Movit>(
-                future: ref.watch(moviProvider).getMovits(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator(); // Muestra un indicador de carga mientras se espera el resultado
-                  } else if (snapshot.hasError) {
-                    return Text(
-                        'Error: ${snapshot.error}'); // Muestra un mensaje de error si algo sale mal
-                  } else {
-                    return MapScreen(
-                        movit: snapshot
-                            .data!); // Usa los datos cuando estén disponibles
-                  }
-                },
+    debugShowCheckedModeBanner: false,
+    theme: ligthThemeWeincode,
+    home: FutureBuilder<Position>(
+      future: Geolocator.getCurrentPosition(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(); // Muestra un indicador de carga mientras se espera el resultado
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); // Muestra un mensaje de error si algo sale mal
+        } else {
+          Position position = snapshot.data!;
+          final fromLat = position.latitude;
+          final fromLon = position.longitude;
+
+          return Navigator(
+            pages: [
+              // Agrega tus rutas aquí
+              MaterialPage(
+                child: PokemonPage(
+                  pokemonDetailList: ref.watch(pokemonProvider).getAllPokemons(),
+                ),
               ),
-            );
-          default:
-            return MaterialPageRoute(builder: ((context) => const HomePage()));
+              MaterialPage(
+                child: ShowDailyDataPage(
+                  astronomyDailyData: ref.watch(astronomyDailyDataProvider).getAstronomydailyData(),
+                ),
+              ),
+              MaterialPage(
+                child: Movitgape(
+                  movit: ref.watch(moviProvider).getMovits(fromLat, fromLon),
+                ),
+              ),
+              MaterialPage(
+                child: MapScreen(
+                  movit: ref.watch(moviProvider).getMovits(fromLat, fromLon),
+                ),
+              ),
+            ],
+            onPopPage: (route, result) => route.didPop(result),
+          );
         }
       },
-    );
+    ),
+  );
   }
 }
