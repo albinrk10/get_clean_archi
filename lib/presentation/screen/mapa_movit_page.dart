@@ -19,6 +19,12 @@ class _MapScreenState extends State<MapScreen> {
   Set<Polyline> polylines = {};
   Itinerary? selectedItinerary;
 
+  double currentLocationLat = -11.915728408209805;
+  double currentLocationLon = -77.05261230468751;
+
+  double destinationLat = -12.113515738274808;
+  double destinationLon = -77.02617645263673;
+
   @override
   void initState() {
     super.initState();
@@ -59,11 +65,27 @@ class _MapScreenState extends State<MapScreen> {
   void _createMarkersAndPolylines() {
     markers.clear();
     polylines.clear();
+      // Add marker for start location (current location)
+  markers.add(Marker(
+    markerId: MarkerId('start'),
+    position: LatLng(currentLocationLat, currentLocationLon), // replace with your current location coordinates
+    infoWindow: InfoWindow(title: 'Start'),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+  ));
+
+  // Add marker for end location (destination)
+  markers.add(Marker(
+    markerId: MarkerId('end'),
+    position: LatLng(destinationLat, destinationLon), // replace with your destination coordinates
+    infoWindow: InfoWindow(title: 'End'),
+     //icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+  ));
     for (var leg in selectedItinerary!.legs) {
       // Create a marker for the start and end of the leg
       markers.add(Marker(
         markerId: MarkerId('from_${leg.from.name}'),
         position: LatLng(leg.from.lat, leg.from.lon),
+       // icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ));
       markers.add(Marker(
         markerId: MarkerId('to_${leg.to.name}'),
@@ -88,8 +110,23 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return selectedItinerary == null
-        ? const Center(child: Text('No itinerary selected'))
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Map'),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            setState(() {
+              markers.clear();
+              polylines.clear();
+            });
+          },
+        ),
+      ],
+    ),
+    body: selectedItinerary == null
+        ? Center(child: Text('No itinerary selected'))
         : GoogleMap(
             onMapCreated: (controller) => mapController = controller,
             initialCameraPosition: CameraPosition(
@@ -99,6 +136,14 @@ class _MapScreenState extends State<MapScreen> {
             ),
             markers: markers,
             polylines: polylines,
-          );
-  }
+          ),
+    floatingActionButton: FloatingActionButton(
+      child: Icon(Icons.directions),
+      onPressed: () {
+        showItineraryDialog(context, widget.movit.content.plan.itineraries);
+      },
+    ),
+    
+  );
+}
 }
